@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/badoux/checkmail"
+	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -95,4 +96,22 @@ func (u *User) Validate(action string) error {
 			return nil
 		}
 	}
+}
+
+func (u *User) saveUser(db *gorm.DB) (*User, error) {
+
+	err := db.Debug().Create(&u).Error
+	if err != nil {
+		return &User{}, err
+	}
+	return u, nil
+}
+
+func (u *User) findAllUsers(db *gorm.DB) (*[]User, error) {
+	users := []User{}
+	err := db.Debug().Model(&User{}).Limit(100).Find(&users).Error
+	if err != nil {
+		return &[]User{}, err
+	}
+	return &users, err
 }
