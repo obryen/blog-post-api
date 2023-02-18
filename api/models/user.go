@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 	"html"
+	"log"
 	"strings"
 	"time"
 
@@ -114,4 +115,47 @@ func (u *User) findAllUsers(db *gorm.DB) (*[]User, error) {
 		return &[]User{}, err
 	}
 	return &users, err
+}
+
+func (u *User) findUserById(db *gorm.DB, uid uint32) (*User, error) {
+	err := db.Debug().Model(User{}).Where("id = ?", uid).Take(&u).Error
+	if err != nil {
+		return &User{}, err
+	}
+
+	if gorm.IsRecordNotFoundError(err) {
+		return &User{}, errors.New("User not found")
+	}
+	return u, err
+}
+
+func (u *User) udateOneUser(db *gorm.DB, uid uint32) (*User, error) {
+	err := u.beforeSave()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	db = db.Debug().Model(&User{}).Where("id = ?", uid).Take(&User{}).UpdateColumns(
+		map[string]interface{}{
+			"password":  u.Password,
+			"nickname":  u.Nickname,
+			"email":     u.Email,
+			"update_at": time.Now(),
+		},
+	)
+	err = db.Debug().Model(&User{}).Where("id =?", uid).Take(&u).Error
+	if err != nil {
+		return &User{}, err
+	}
+	return u, nil
+}
+
+func (u *User) DeleteUser(db *gorm.DB, uid uint32) (int64, error) {
+	db = db.Debug().Model(&User{}).Where("id = ?", uid).Take(&User{}).Delete(&User{})
+
+	if db.Error != nil {
+		return 0, db.Error
+	}
+
+	return db.RowsAffected, nil
 }
