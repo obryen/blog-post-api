@@ -19,7 +19,7 @@ type Post struct {
 	UpdatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 }
 
-func (p *Post) prep() {
+func (p *Post) Prep() {
 	p.ID = 0
 	p.Title = html.EscapeString(strings.TrimSpace(p.Title))
 	p.Content = html.EscapeString(strings.TrimSpace(p.Content))
@@ -28,7 +28,7 @@ func (p *Post) prep() {
 	p.UpdatedAt = time.Now()
 }
 
-func (p *Post) validate() error {
+func (p *Post) Validate() error {
 	if p.Title == "" {
 		return errors.New("Title is missing")
 	}
@@ -41,7 +41,7 @@ func (p *Post) validate() error {
 	return nil
 }
 
-func (p *Post) findAllPosts(db *gorm.DB) (*[]Post, error) {
+func (p *Post) FindAllPosts(db *gorm.DB) (*[]Post, error) {
 	var err error
 	posts := []Post{}
 	err = db.Debug().Model(&Post{}).Limit(100).Find(&posts).Error
@@ -59,7 +59,7 @@ func (p *Post) findAllPosts(db *gorm.DB) (*[]Post, error) {
 	return &posts, nil
 }
 
-func (p *Post) findOnePost(db *gorm.DB, pId uint64) (*Post, error) {
+func (p *Post) FindOnePost(db *gorm.DB, pId uint64) (*Post, error) {
 	var err error
 	err = db.Debug().Model(&Post{}).Where("id = ?", pId).Take(&p).Error
 	if err != nil {
@@ -74,7 +74,7 @@ func (p *Post) findOnePost(db *gorm.DB, pId uint64) (*Post, error) {
 	return p, nil
 }
 
-func (p *Post) updateAPost(db *gorm.DB) (*Post, error) {
+func (p *Post) UpdateAPost(db *gorm.DB) (*Post, error) {
 
 	var err error
 
@@ -91,7 +91,7 @@ func (p *Post) updateAPost(db *gorm.DB) (*Post, error) {
 	return p, nil
 }
 
-func (p *Post) deleteAPost(db *gorm.DB, pid uint64, uid uint32) (int64, error) {
+func (p *Post) DeleteAPost(db *gorm.DB, pid uint64, uid uint32) (int64, error) {
 
 	db = db.Debug().Model(&Post{}).Where("id = ? and author_id = ?", pid, uid).Take(&Post{}).Delete(&Post{})
 

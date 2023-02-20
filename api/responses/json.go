@@ -14,7 +14,7 @@ func ToJsonResponse(w http.ResponseWriter, statusCode int, data interface{}) {
 	}
 }
 
-func toError(w http.ResponseWriter, statusCode int, err error) {
+func ToError(w http.ResponseWriter, statusCode int, err error) {
 	if err != nil {
 		ToJsonResponse(w, statusCode, struct {
 			Error string `json:"error"`
