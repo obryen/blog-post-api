@@ -16,12 +16,12 @@ func ToJsonResponse(w http.ResponseWriter, statusCode int, data interface{}) {
 
 func toError(w http.ResponseWriter, statusCode int, err error) {
 	if err != nil {
-		toJsonResponse(w, statusCode, struct {
+		ToJsonResponse(w, statusCode, struct {
 			Error string `json:"error"`
 		}{
 			Error: err.Error(),
 		})
 		return
 	}
-	toJsonResponse(w, http.StatusBadRequest, nil)
+	ToJsonResponse(w, http.StatusBadRequest, nil)
 }
