@@ -23,7 +23,7 @@ func generateToken(userId uint32) (string, error) {
 	return token.SignedString([]byte(os.Getenv("API_SECRET")))
 }
 
-func validateToken(request *http.Request) error {
+func ValidateToken(request *http.Request) error {
 	tokenString := extractToken(request)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
