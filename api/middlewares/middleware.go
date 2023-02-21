@@ -8,7 +8,7 @@ import (
 	"github.com/obryen/blog-api/api/responses"
 )
 
-func setResponsesToJson(next http.HandlerFunc) http.HandlerFunc {
+func SetResponsesToJson(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		next(w, r)

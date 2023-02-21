@@ -25,11 +25,11 @@ func hash(password string) ([]byte, error) {
 	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 }
 
-func verifyPassword(hashedPassword, password string) error {
+func VerifyPassword(hashedPassword, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
 
-func (u *User) beforeSave() error {
+func (u *User) BeforeSave() error {
 	hashedPassword, err := hash(u.Password)
 
 	if err != nil {
@@ -39,7 +39,7 @@ func (u *User) beforeSave() error {
 	return nil
 }
 
-func (u *User) prepare() {
+func (u *User) Prepare() {
 	u.ID = 0
 	u.Nickname = html.EscapeString(strings.TrimSpace((u.Nickname)))
 	u.Email = html.EscapeString(strings.TrimSpace(u.Email))
@@ -99,7 +99,7 @@ func (u *User) Validate(action string) error {
 	}
 }
 
-func (u *User) saveUser(db *gorm.DB) (*User, error) {
+func (u *User) SaveUser(db *gorm.DB) (*User, error) {
 
 	err := db.Debug().Create(&u).Error
 	if err != nil {
@@ -108,7 +108,7 @@ func (u *User) saveUser(db *gorm.DB) (*User, error) {
 	return u, nil
 }
 
-func (u *User) findAllUsers(db *gorm.DB) (*[]User, error) {
+func (u *User) FindAllUsers(db *gorm.DB) (*[]User, error) {
 	users := []User{}
 	err := db.Debug().Model(&User{}).Limit(100).Find(&users).Error
 	if err != nil {
@@ -117,7 +117,7 @@ func (u *User) findAllUsers(db *gorm.DB) (*[]User, error) {
 	return &users, err
 }
 
-func (u *User) findUserById(db *gorm.DB, uid uint32) (*User, error) {
+func (u *User) FindUserById(db *gorm.DB, uid uint32) (*User, error) {
 	err := db.Debug().Model(User{}).Where("id = ?", uid).Take(&u).Error
 	if err != nil {
 		return &User{}, err
@@ -129,8 +129,8 @@ func (u *User) findUserById(db *gorm.DB, uid uint32) (*User, error) {
 	return u, err
 }
 
-func (u *User) udateOneUser(db *gorm.DB, uid uint32) (*User, error) {
-	err := u.beforeSave()
+func (u *User) UdateOneUser(db *gorm.DB, uid uint32) (*User, error) {
+	err := u.BeforeSave()
 
 	if err != nil {
 		log.Fatal(err)
